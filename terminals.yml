@@ -1,0 +1,14 @@
+---
+session_name: demo
+start_directory: "."
+windows:
+  - window_name: node1
+    layout: even-horizontal
+    panes:
+      - vagrant ssh node1 -c 'sudo su -'
+      - vagrant ssh node1 -c 'sudo su -'
+  - window_name: node2
+    layout: even-horizontal
+    panes:
+      - vagrant ssh node2 -c 'sudo su -'
+      - vagrant ssh node2 -c 'sudo su -'

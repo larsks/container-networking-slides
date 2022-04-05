@@ -1,0 +1,37 @@
+@import url(https://fonts.googleapis.com/css?family=Red+Hat+Display);
+@import url(https://fonts.googleapis.com/css?family=Red+Hat+Text);
+@import url(https://fonts.googleapis.com/css?family=Red+Hat+Mono);
+@import url(github.css);
+
+body {
+	font-family: 'Red Hat Text';
+}
+h1, h2, h3 {
+	font-family: 'Red Hat Display';
+	font-weight: bolder;
+}
+
+a {
+	text-decoration: none;
+}
+
+.red {
+	color: red;
+	font-weight: bold;
+}
+
+.red a {
+	color: red;
+	font-weight: bold;
+}
+
+.text.remark-code {
+	display: block;
+	background: #f0f0f0;
+	padding: 0.5em;
+	overflow-x: auto;
+}
+
+.nodecoration li {
+	list-style: none;
+}

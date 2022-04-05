@@ -1,0 +1,157 @@
+- hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Upgrade packages
+      package:
+        name: '*'
+        state: latest
+
+    - name: Install packages
+      package:
+        name:
+          - avahi
+          - docker-compose
+          - jq
+          - nss-mdns
+          - openvswitch
+          - podman
+          - systemd-container
+          - tcpdump
+          - tmux
+        state: latest
+
+    # We'll use this group to grant non-root users access to
+    # the podman socket (/run/podman/podman.sock).
+    - name: Create container group
+      group:
+        name: container
+        system: true
+        state: present
+
+    - name: Create override directory for openvswitch.service
+      file:
+        path: /etc/systemd/system/openvswitch.service.d
+        state: directory
+
+    # Create an override for the openvswitch.service unit that will remove the
+    # ovs database at startup. This ensures we always start with a fresh
+    # environment.
+    - name: Install override configuration for openvswitch.service
+      copy:
+        src: files/openvswitch.service.override.conf
+        dest: /etc/systemd/system/openvswitch.service.d/override.conf
+
+    - name: Activate openvswitch
+      service:
+        name: openvswitch
+        enabled: true
+        state: started
+
+    - name: Activate avahi-daemon
+      service:
+        name: avahi-daemon
+        enabled: true
+        state: started
+
+    - name: Create override directory for podman.socket
+      file:
+        path: /etc/systemd/system/podman.socket.d
+        state: directory
+
+    # Create an override for the podman.socket unit that sets the group of the
+    # socket to the `container` group we created earlier.
+    - name: Install override configuration for podman.socket
+      copy:
+        src: files/podman.socket.override.conf
+        dest: /etc/systemd/system/podman.socket.d/override.conf
+
+    - name: Enable podman socket
+      service:
+        name: podman.socket
+        enabled: true
+        state: started
+
+    - name: Make vagrant user a member of container group
+      user:
+        name: vagrant
+        groups:
+          - container
+        append: true
+
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: Download alpine image
+      get_url:
+        url: https://dl-cdn.alpinelinux.org/alpine/v3.15/releases/x86_64/alpine-standard-3.15.4-x86_64.iso
+        dest: /home/vagrant/alpine.iso
+
+    - block:
+        - name: Mount Alpine image
+          become: true
+          mount:
+            path: /mnt
+            src: /home/vagrant/alpine.iso
+            opts: ro,loop
+            fstype: auto
+            state: mounted
+
+        - name: Create target directory
+          become: true
+          file:
+            path: /srv/alpine
+            state: directory
+
+        - shell:
+            cmd: |
+              find /mnt -type f -print
+          register: result
+
+        - debug:
+            var: result.stdout_lines
+
+        - name: Extract initramfs filesystem
+          become: true
+          shell:
+            cmd: |
+              zcat /mnt/boot/initramfs-lts | cpio -id
+            chdir: /srv/alpine
+
+        - name: Install busybox
+          become: true
+          shell:
+            cmd: |
+              ln -s /sbin /srv/alpine/usr/sbin
+              ln -s /bin /srv/alpine/usr/bin
+              systemd-nspawn -D /srv/alpine -- /bin/busybox --install -s /bin
+
+      rescue:
+        - name: Clean up target directory on error
+          become: true
+          shell:
+            cmd: rm -rf /srv/alpine
+
+      always:
+        - name: Unmount Alpine image
+          become: true
+          mount:
+            path: /mnt
+            src: /home/vagrant/alpine.iso
+            state: absent
+
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: Create .bashrc.d directory
+      file:
+        path: /home/vagrant/.bashrc.d
+        state: directory
+
+    # Sets DOCKER_HOST such that docker-compose will communicate with
+    # Podman over /run/podman/podman.sock.
+    - name: Install docker.sh bash rc file
+      copy:
+        src: files/docker.sh
+        dest: /home/vagrant/.bashrc.d/docker.sh
+        mode: "0644"
