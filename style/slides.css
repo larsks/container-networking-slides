@@ -1,0 +1,11 @@
+h1, h2, h3 {
+  color: #EE0000;
+  padding-left: 5px;
+}
+
+blockquote p {
+  font-style: italic;
+}
+
+.remark-code, .remark-inline-code { font-family: "Red Hat Mono"; }
+
