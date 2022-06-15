@@ -144,13 +144,13 @@ nsenter -t <pid> -n
 
 # Demo 1: Network namespaces and bridge devices
 
-[Demo 1](demo1-linux-bridge.md)
+[Demo 1](demo1-linux-bridge)
 
 ---
 
 # Demo 2: Networking in Podman
 
-[Demo 2](demo2-podman-networking.md)
+[Demo 2](demo2-podman-networking)
 
 ---
 
