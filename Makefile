@@ -1,6 +1,7 @@
 MDFILES = \
-	demo1-linux-bridge.md \
-	demo2-podman-networking.md
+	./demo1-linux-bridge/index.md \
+	./demo2-podman-networking/index.md \
+	./demo3-openvswitch/index.md
 
 HTMLFILES = $(MDFILES:.md=.html)
 
