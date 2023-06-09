@@ -114,14 +114,14 @@ Result:
 Using `nsenter`:
 
 ```sh
-web1_pid=$(podman inspect web1 | jq '.[0].State.Pid')
+web1_pid=$(podman inspect web1 -f '{{.State.Pid}}')
 nsenter -t $web1_pid -n ip addr
 ```
 
 Result:
 
 ```
-[root@node1 ~]# web1_pid=$(podman inspect web1 | jq '.[0].State.Pid')
+[root@node1 ~]# web1_pid=$(podman inspect web1 -f '{{.State.Pid}}')
 [root@node1 ~]# nsenter -t $web1_pid -n ip addr
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
@@ -266,16 +266,16 @@ podman run --rm --replace --name web2 --hostname web2 -d \
 ### Demonstrate access from host
 
 ```sh
-web1_addr=$(podman inspect web1 | jq -r '.[0].NetworkSettings.Networks.mynetwork.IPAddress')
+web1_addr=$(podman inspect web1 -f '{{.NetworkSettings.Networks.mynetwork.IPAddress}}')
 curl $web1_addr
-web2_addr=$(podman inspect web2 | jq -r '.[0].NetworkSettings.Networks.mynetwork.IPAddress')
+web2_addr=$(podman inspect web2 -f '{{.NetworkSettings.Networks.mynetwork.IPAddress}}')
 curl $web2_addr
 ```
 
 Result:
 
 ```
-[root@node1 ~]# web1_addr=$(podman inspect web1 | jq -r '.[0].NetworkSettings.Networks.mynetwork.IPAddress')
+[root@node1 ~]# web1_addr=$(podman inspect web1 -f '{{.NetworkSettings.Networks.mynetwork.IPAddress}}')
 [root@node1 ~]# curl $web1_addr
 Hostname: web1
 IP: 127.0.0.1
@@ -287,7 +287,7 @@ GET / HTTP/1.1
 Host: 10.89.0.4
 User-Agent: curl/8.0.1
 Accept: */*
-[root@node1 ~]# web2_addr=$(podman inspect web2 | jq -r '.[0].NetworkSettings.Networks.mynetwork.IPAddress')
+[root@node1 ~]# web2_addr=$(podman inspect web2 -f '{{.NetworkSettings.Networks.mynetwork.IPAddress}}')
 [root@node1 ~]# curl $web2_addr
 Hostname: web2
 IP: 127.0.0.1
