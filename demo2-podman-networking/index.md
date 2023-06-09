@@ -11,13 +11,13 @@ what we built by hand in the previous demo.
 
 ### Examine network configuration
 
-```
+```sh
 ip addr
 ```
 
 Result:
 
-```
+```console
 [root@node1 ~]# ip addr
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
@@ -51,7 +51,7 @@ podman run --rm --replace --name web1 --hostname web1 -d ghcr.io/larsks/whoami:m
 
 Result:
 
-```
+```console
 [root@node1 ~]# podman ps
 CONTAINER ID  IMAGE                       COMMAND     CREATED        STATUS        PORTS       NAMES
 5a6e9e0ccee7  ghcr.io/larsks/whoami:main  whoami      2 seconds ago  Up 2 seconds              web1
@@ -74,7 +74,7 @@ ip netns
 
 Result:
 
-```
+```console
 [root@node1 ~]# ip link show type bridge
 4: podman0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
     link/ether be:61:e0:f4:9f:e2 brd ff:ff:ff:ff:ff:ff
@@ -95,7 +95,7 @@ podman exec web1 ip addr
 
 Result:
 
-```
+```console
 [root@node1 ~]# podman exec web1 ip addr
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
@@ -120,7 +120,7 @@ nsenter -t $web1_pid -n ip addr
 
 Result:
 
-```
+```console
 [root@node1 ~]# web1_pid=$(podman inspect web1 -f '{{.State.Pid}}')
 [root@node1 ~]# nsenter -t $web1_pid -n ip addr
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
@@ -145,7 +145,7 @@ iptables -t nat -S
 
 Result:
 
-```
+```console
 [root@node1 ~]# iptables -t nat -S
 -P PREROUTING ACCEPT
 -P INPUT ACCEPT
@@ -181,7 +181,7 @@ podman run --rm --replace --name web2 --hostname web2 -d ghcr.io/larsks/whoami:m
 
 Result:
 
-```
+```console
 [root@node1 ~]# podman ps
 CONTAINER ID  IMAGE                       COMMAND     CREATED        STATUS        PORTS       NAMES
 26ecdb0cfd06  ghcr.io/larsks/whoami:main  whoami      3 seconds ago  Up 3 seconds              web1
@@ -196,7 +196,7 @@ podman exec web1 curl -sS web2
 
 Result:
 
-```
+```console
 [root@node1 ~]# podman exec web1 curl -sS  web2
 curl: (6) Could not resolve host: web2
 ```
@@ -209,7 +209,7 @@ podman network create mynetwork
 
 Result:
 
-```
+```console
 [root@node1 ~]# podman network ls
 NETWORK ID    NAME        DRIVER
 9fa7b113aa45  mynetwork   bridge
@@ -233,7 +233,7 @@ podman exec web1 curl -sS web2
 
 Result:
 
-```
+```console
 [root@node1 ~]# podman exec web1 curl -sS web2
 Hostname: web2
 IP: 127.0.0.1
@@ -274,7 +274,7 @@ curl $web2_addr
 
 Result:
 
-```
+```console
 [root@node1 ~]# web1_addr=$(podman inspect web1 -f '{{.NetworkSettings.Networks.mynetwork.IPAddress}}')
 [root@node1 ~]# curl $web1_addr
 Hostname: web1
@@ -325,7 +325,7 @@ curl http://localhost:8081
 
 Result:
 
-```
+```console
 [root@node1 ~]# curl http://localhost:8080
 Hostname: web1
 IP: 127.0.0.1
@@ -358,7 +358,7 @@ iptables -t nat -S
 
 Result:
 
-```
+```console
 [root@node1 ~]# iptables -t nat -S
 -P PREROUTING ACCEPT
 -P INPUT ACCEPT
@@ -403,7 +403,7 @@ ip addr show eth0
 
 Result:
 
-```
+```console
 [root@node1 ~]# ip addr show eth0
 2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
     link/ether 52:54:00:de:05:13 brd ff:ff:ff:ff:ff:ff
@@ -430,7 +430,7 @@ podman run --rm --replace --name web2 --hostname web2 -p 192.168.121.201:80:80 -
 
 Result:
 
-```
+```console
 [root@node1 ~]# podman ps
 CONTAINER ID  IMAGE                       COMMAND     CREATED        STATUS        PORTS                       NAMES
 d8c01a597b12  ghcr.io/larsks/whoami:main  whoami      2 seconds ago  Up 2 seconds  192.168.121.200:80->80/tcp  web1
@@ -446,7 +446,7 @@ curl http://192.168.121.201
 
 Result:
 
-```
+```console
 [root@node1 ~]# curl http://192.168.121.200
 Hostname: web1
 IP: 127.0.0.1

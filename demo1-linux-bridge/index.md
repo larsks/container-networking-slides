@@ -19,7 +19,7 @@ ip link add br0 type bridge
 
 Result:
 
-```
+```console
 [root@node1 ~]# ip link show br0
 4: br0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
     link/ether 9a:b5:85:9a:ad:c5 brd ff:ff:ff:ff:ff:ff
@@ -34,7 +34,7 @@ ip netns add ns2
 
 Result:
 
-```
+```console
 [root@node1 ~]# ip netns
 ns2 (id: 1)
 ns1 (id: 0)
@@ -49,7 +49,7 @@ ip link add ns2-ext type veth peer name ns2-int netns ns2
 
 Result:
 
-```
+```console
 [root@node1 ~]# ip link show type veth
 5: ns1-ext@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br0 state UP mode DEFAULT group default qlen 1000
     link/ether d6:69:bd:06:9c:fa brd ff:ff:ff:ff:ff:ff link-netns ns1
@@ -72,7 +72,7 @@ ip link set master br0 dev ns2-ext
 
 Result:
 
-```
+```console
 [root@node1 ~]# ip link show master br0
 5: ns1-ext@if2: <BROADCAST,MULTICAST> mtu 1500 qdisc noop master br0 state DOWN mode DEFAULT group default qlen 1000
     link/ether d6:69:bd:06:9c:fa brd ff:ff:ff:ff:ff:ff link-netns ns1
@@ -89,7 +89,7 @@ ip -n ns2 addr add 192.168.255.12/24 dev ns2-int
 
 Result:
 
-```
+```console
 [root@node1 ~]# ip -n ns1 addr show
 1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
@@ -115,7 +115,7 @@ ip netns exec ns2 ping -c2 192.168.255.11
 
 Result:
 
-```
+```console
 [root@node1 ~]# ip netns exec ns1 ping -c2 192.168.255.12
 ping: connect: Network is unreachable
 [root@node1 ~]# ip netns exec ns2 ping -c2 192.168.255.11
@@ -134,7 +134,7 @@ ip -n ns2 link set ns2-int up
 
 Now retry `ping` commands:
 
-```
+```console
 [root@node1 ~]# ip netns exec ns1 ping -c2 192.168.255.12
 PING 192.168.255.12 (192.168.255.12) 56(84) bytes of data.
 64 bytes from 192.168.255.12: icmp_seq=1 ttl=64 time=0.065 ms
@@ -168,7 +168,7 @@ ip netns exec ns1 ping -c2 $host_address
 
 Result:
 
-```
+```console
 ping: connect: Network is unreachable
 ```
 
@@ -182,7 +182,7 @@ ip addr add 192.168.255.1/24 dev br0
 
 Result:
 
-```
+```console
 [root@node1 ~]# ip addr show br0
 4: br0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
     link/ether ce:10:da:46:71:fb brd ff:ff:ff:ff:ff:ff
@@ -201,7 +201,7 @@ ip -n ns2 route add default via 192.168.255.1
 
 Result:
 
-```
+```console
 [root@node1 ~]# ip -n ns1 route
 default via 192.168.255.1 dev ns1-int
 192.168.255.0/24 dev ns1-int proto kernel scope link src 192.168.255.11
@@ -219,7 +219,7 @@ ip netns exec ns1 ping -c2 $host_address
 
 Result:
 
-```
+```console
 [root@node1 ~]# host_address="$(ip route | sed -n '/default/ s/.*src \([^ ]*\).*/\1/p;q')"
 [root@node1 ~]# ip netns exec ns1 ping -c2 $host_address
 PING 192.168.121.67 (192.168.121.67) 56(84) bytes of data.
@@ -245,7 +245,7 @@ ip netns exec ns1 ping -c2 8.8.8.8
 
 Result:
 
-```
+```console
 [root@node1 ~]# ip netns exec ns1 ping -c2 8.8.8.8
 PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
 
@@ -264,7 +264,7 @@ sysctl -w net.ipv4.ip_forward=1
 Use `tcpdump` to see that ICMP echo requests packets egress on `eth0`, but
 they have the source address of the namespace.
 
-```
+```console
 [root@node1 ~]# tcpdump -i eth0 -nn icmp
 dropped privs to tcpdump
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
@@ -281,7 +281,7 @@ iptables -t nat -A POSTROUTING -s 192.168.255.0/24 -j MASQUERADE
 
 Result:
 
-```
+```console
 [root@node1 ~]# iptables -t nat -S
 -P PREROUTING ACCEPT
 -P INPUT ACCEPT
@@ -298,7 +298,7 @@ ip netns exec ns1 ping -c2 8.8.8.8
 
 Use `tcpdump` to see that ICMP echo request packets now use the address of `eth0` as the source address:
 
-```
+```console
 [root@node1 ~]# tcpdump -i eth0 -nn icmp
 dropped privs to tcpdump
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode

@@ -17,7 +17,7 @@ ip link set br1 up
 
 Result:
 
-```
+```console
 [root@node1 ~]# ovs-vsctl show
 e2569579-f87a-4cd9-8d2c-e734a8849301
     Bridge br1
@@ -46,7 +46,7 @@ ovs-vsctl add-port br1 vif2 -- set interface vif2 type=internal
 
 Result:
 
-```
+```console
 [root@node1 ~]# ovs-vsctl show
 f151beb1-81eb-44b7-ab78-94524aae8bc8
     Bridge br1
@@ -157,7 +157,7 @@ ovs-vsctl add-port br1 tun1 -- set interface tun1 \
 
 Result:
 
-```
+```console
 [root@node2 ~]# ovs-vsctl show
 d4e01762-4cd1-4e53-b502-78f852cd1ad3
     Bridge br1
@@ -186,7 +186,7 @@ ovs-vsctl add-port br1 tun1 -- set interface tun1 \
 
 Result:
 
-```
+```console
 [root@node1 ~]# ovs-vsctl show
 f151beb1-81eb-44b7-ab78-94524aae8bc8
     Bridge br1
@@ -231,7 +231,7 @@ remote networks through the bridge on `node1`.
 
 On `node1` run:
 
-```
+```console
 ip -n ns1 route add default via 192.168.255.1
 ip -n ns2 route add default via 192.168.255.1
 ```
@@ -276,7 +276,7 @@ ip netns exec ns3 ping -c2 8.8.8.8
 
 Use `tcpdump` on `node1` to show traffic. See encapsulated traffic on `eth1`:
 
-```
+```console
 [root@node1 ~]# tcpdump -i eth1 -nn not broadcast and not multicast
 dropped privs to tcpdump
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
@@ -289,7 +289,7 @@ listening on eth1, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 
 And the un-encapsulated traffic egressing on `eth0`:
 
-```
+```console
 [root@node1 ~]# tcpdump -i eth0 -nn  icmp
 dropped privs to tcpdump
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
