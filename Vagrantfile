@@ -22,14 +22,17 @@ Vagrant.configure("2") do |config|
           :size => "10G",
           :type => "qcow2"
       end
-    end
-  end
 
-  config.vm.provision :ansible do |ansible|
-    ansible.compatibility_mode = "2.0"
-    ansible.playbook = "provision.yml"
-    ansible.groups = {
-      "nodes" => Array.new(node_count) { |machine_id| "node#{machine_id+1}" },
-    }
+    if machine_id == node_count
+      config.vm.provision :ansible do |ansible|
+        ansible.limit = "all"
+        ansible.compatibility_mode = "2.0"
+        ansible.playbook = "provision.yml"
+        ansible.groups = {
+          "nodes" => Array.new(node_count) { |machine_id| "node#{machine_id+1}" },
+        }
+      end
+      end
+    end
   end
 end
