@@ -1,4 +1,25 @@
 - hosts: all
+  gather_facts: true
+  become: true
+  tags: [hosts]
+  tasks:
+    - name: Remove old entries from /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        regexp: "{{ item }}-pvt"
+        state: absent
+      loop: "{{ groups.nodes }}"
+
+    - name: Add nodes to /etc/hosts
+      when: >-
+        "ansible_eth1" in hostvars[item]
+      lineinfile:
+        path: /etc/hosts
+        regexp: "{{ item }}-pvt"
+        line: "{{ hostvars[item].ansible_eth1.ipv4.address }} {{ item }}-pvt"
+      loop: "{{ groups.nodes }}"
+
+- hosts: all
   gather_facts: false
   become: true
   tasks:
@@ -107,9 +128,6 @@
             cmd: |
               find /mnt -type f -print
           register: result
-
-        - debug:
-            var: result.stdout_lines
 
         - name: Extract initramfs filesystem
           become: true
