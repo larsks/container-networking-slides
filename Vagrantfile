@@ -8,8 +8,7 @@ Vagrant.configure("2") do |config|
     libvirt.memory = 4096
   end
 
-  config.vm.box = "fedora/35-cloud-base"
-  config.vm.box_version = "35.20211026.0"
+  config.vm.box = "fedora/38-cloud-base"
 
   (1..node_count).each do |machine_id|
     config.vm.define "node#{machine_id}" do |node|
