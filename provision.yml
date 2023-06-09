@@ -1,4 +1,30 @@
 - hosts: all
+  gather_facts: true
+  become: true
+  tags: [hosts]
+  tasks:
+    - name: Remove old entries from /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        regexp: "{{ item.0 }}-{{ item.1 }}"
+        state: absent
+      loop: "{{ groups.nodes|product(['pvt', 'pub']) }}"
+
+    - name: Add public address to /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        regexp: "{{ item }}-pub"
+        line: "{{ hostvars[item].ansible_eth0.ipv4.address }} {{ item }}-pub"
+      loop: "{{ groups.nodes }}"
+
+    - name: Add private address to /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        regexp: "{{ item }}-pvt"
+        line: "{{ hostvars[item].ansible_eth1.ipv4.address }} {{ item }}-pvt"
+      loop: "{{ groups.nodes }}"
+
+- hosts: all
   gather_facts: false
   become: true
   tasks:
@@ -107,9 +133,6 @@
             cmd: |
               find /mnt -type f -print
           register: result
-
-        - debug:
-            var: result.stdout_lines
 
         - name: Extract initramfs filesystem
           become: true
