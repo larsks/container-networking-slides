@@ -27,6 +27,7 @@
 - hosts: all
   gather_facts: false
   become: true
+  tags: [basic]
   tasks:
     - name: Upgrade packages
       package:
@@ -107,6 +108,7 @@
 
 - hosts: all
   gather_facts: false
+  tags: [alpine]
   tasks:
     - name: Download alpine image
       get_url:
@@ -162,6 +164,20 @@
             path: /mnt
             src: /home/vagrant/alpine.iso
             state: absent
+
+- hosts: all
+  gather_facts: false
+  become: true
+  tags: [whoami]
+  tasks:
+    - name: Download whoami release
+      get_url:
+        url: https://github.com/traefik/whoami/releases/download/v1.9.0/whoami_v1.9.0_linux_amd64.tar.gz
+        dest: /tmp/whoami.tar.gz
+
+    - name: Install whoami command
+      command: >-
+        tar -C /usr/local/bin -xf /tmp/whoami.tar.gz whoami
 
 - hosts: all
   gather_facts: false
