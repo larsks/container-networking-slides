@@ -46,7 +46,7 @@ Result:
 ### Create a container
 
 ```sh
-podman run --rm --replace --name web1 --hostname web1 -d ghcr.io/larsks/whoami:main
+podman run --rm --replace --name web1 --hostname web1 -d ghcr.io/larsks/whoami:latest
 ```
 
 Result:
@@ -54,7 +54,7 @@ Result:
 ```console
 [root@node1 ~]# podman ps
 CONTAINER ID  IMAGE                       COMMAND     CREATED        STATUS        PORTS       NAMES
-5a6e9e0ccee7  ghcr.io/larsks/whoami:main  whoami      2 seconds ago  Up 2 seconds              web1
+5a6e9e0ccee7  ghcr.io/larsks/whoami:latest  whoami      2 seconds ago  Up 2 seconds              web1
 ```
 
 ### Examine changes to network configuration
@@ -175,8 +175,8 @@ default network.
 ### Create two containers
 
 ```sh
-podman run --rm --replace --name web1 --hostname web1 -d ghcr.io/larsks/whoami:main
-podman run --rm --replace --name web2 --hostname web2 -d ghcr.io/larsks/whoami:main
+podman run --rm --replace --name web1 --hostname web1 -d ghcr.io/larsks/whoami:latest
+podman run --rm --replace --name web2 --hostname web2 -d ghcr.io/larsks/whoami:latest
 ```
 
 Result:
@@ -184,8 +184,8 @@ Result:
 ```console
 [root@node1 ~]# podman ps
 CONTAINER ID  IMAGE                       COMMAND     CREATED        STATUS        PORTS       NAMES
-26ecdb0cfd06  ghcr.io/larsks/whoami:main  whoami      3 seconds ago  Up 3 seconds              web1
-85578efbceb5  ghcr.io/larsks/whoami:main  whoami      3 seconds ago  Up 3 seconds              web2
+26ecdb0cfd06  ghcr.io/larsks/whoami:latest  whoami      3 seconds ago  Up 3 seconds              web1
+85578efbceb5  ghcr.io/larsks/whoami:latest  whoami      3 seconds ago  Up 3 seconds              web2
 ```
 
 ### Show name lookup failure
@@ -220,9 +220,9 @@ NETWORK ID    NAME        DRIVER
 
 ```sh
 podman run --replace --name web1 --hostname web1 -d \
-  --network mynetwork ghcr.io/larsks/whoami:main
+  --network mynetwork ghcr.io/larsks/whoami:latest
 podman run --replace --name web2 --hostname web2 -d \
-  --network mynetwork ghcr.io/larsks/whoami:main
+  --network mynetwork ghcr.io/larsks/whoami:latest
 ```
 
 ### Show name lookup success
@@ -258,9 +258,9 @@ any ports.
 
 ```sh
 podman run --rm --replace --name web1 --hostname web1 -d \
-  --network mynetwork ghcr.io/larsks/whoami:main
+  --network mynetwork ghcr.io/larsks/whoami:latest
 podman run --rm --replace --name web2 --hostname web2 -d \
-  --network mynetwork ghcr.io/larsks/whoami:main
+  --network mynetwork ghcr.io/larsks/whoami:latest
 ```
 
 ### Demonstrate access from host
@@ -311,9 +311,9 @@ Goal: Understand how to expose services on different host ports.
 
 ```sh
 podman run --rm --replace --name web1 --hostname web1 -p 8080:80 -d \
-  --network mynetwork ghcr.io/larsks/whoami:main
+  --network mynetwork ghcr.io/larsks/whoami:latest
 podman run --rm --replace --name web2 --hostname web2 -p 8081:80 -d \
-  --network mynetwork ghcr.io/larsks/whoami:main
+  --network mynetwork ghcr.io/larsks/whoami:latest
 ```
 
 ### Demonstrate access from host
@@ -423,9 +423,9 @@ Result:
 
 ```sh
 podman run --rm --replace --name web1 --hostname web1 -p 192.168.121.200:80:80 -d \
-  --network mynetwork ghcr.io/larsks/whoami:main
+  --network mynetwork ghcr.io/larsks/whoami:latest
 podman run --rm --replace --name web2 --hostname web2 -p 192.168.121.201:80:80 -d \
-  --network mynetwork ghcr.io/larsks/whoami:main
+  --network mynetwork ghcr.io/larsks/whoami:latest
 ```
 
 Result:
@@ -433,8 +433,8 @@ Result:
 ```console
 [root@node1 ~]# podman ps
 CONTAINER ID  IMAGE                       COMMAND     CREATED        STATUS        PORTS                       NAMES
-d8c01a597b12  ghcr.io/larsks/whoami:main  whoami      2 seconds ago  Up 2 seconds  192.168.121.200:80->80/tcp  web1
-6af21b2fc41c  ghcr.io/larsks/whoami:main  whoami      1 second ago   Up 2 seconds  192.168.121.201:80->80/tcp  web2
+d8c01a597b12  ghcr.io/larsks/whoami:latest  whoami      2 seconds ago  Up 2 seconds  192.168.121.200:80->80/tcp  web1
+6af21b2fc41c  ghcr.io/larsks/whoami:latest  whoami      1 second ago   Up 2 seconds  192.168.121.201:80->80/tcp  web2
 ```
 
 ### Confirm access from host
