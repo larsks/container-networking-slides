@@ -1,5 +1,5 @@
 ---
-title: Linux bridge device demo
+title: Linux namespaces demo
 ---
 
 ## Basic namespace setup

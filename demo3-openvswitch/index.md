@@ -1,5 +1,5 @@
 ---
-title: Networking with OpenVSwitch
+title: OpenVSwitch networking demo
 ---
 
 ## Connect two containers
