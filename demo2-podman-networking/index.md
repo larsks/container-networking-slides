@@ -387,6 +387,15 @@ Result:
 -A NETAVARK-HOSTPORT-SETMARK -j MARK --set-xmark 0x2000/0x2000
 ```
 
+### Examine sysctl settings
+
+```console
+[root@node1 ~]# sysctl -a -r podman1.route_localnet
+net.ipv4.conf.podman1.route_localnet = 1
+```
+
+We see the same `route_localnet` setting we saw in the namespace demo.
+
 ## Published on different addresses
 
 <!-- file: demo2-ex5.sh -->
