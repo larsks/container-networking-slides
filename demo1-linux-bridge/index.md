@@ -68,7 +68,7 @@ Result:
     link/ether ee:c7:5b:94:08:73 brd ff:ff:ff:ff:ff:ff link-netnsid 0
 ```
 
-### Add vif devices to bridge
+### Add veth devices to bridge
 
 <!-- file: demo1-ex1.sh -->
 ```sh
@@ -263,7 +263,14 @@ PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
 2 packets transmitted, 0 received, 100% packet loss, time 1005ms
 ```
 
-Use `tcpdump` to see that no traffic shows up on `eth0`.
+Use `tcpdump` to see that no traffic shows up on `eth0`:
+
+```console
+[root@node1 ~]# tcpdump -i eth0 -nn icmp
+dropped privs to tcpdump
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on eth0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+```
 
 ### Enable ip forwarding
 
@@ -501,25 +508,11 @@ This is how Docker handles connections from the local host.
 
 ### Undo changes from previous example
 
-Discard the `sysctl` setting and the `MASQUERADE` rule for traffic from `localhost`:
+Discard the `sysctl` setting from the previous example:
 
 <!-- file: demo1-ex5.sh -->
 ```sh
 sysctl -w net.ipv4.conf.br0.route_localnet=0
-iptables -t nat -D POSTROUTING -s 127.0.0.1/32 -d 192.168.255.0/24 -j MASQUERADE
-iptables -t nat -D OUTPUT -p tcp -m tcp --dport 8080 -j DNAT --to-destination 192.168.255.11:80
-```
-
-Result:
-
-```console
-[root@node1 ~]# iptables -t nat -S
--P PREROUTING ACCEPT
--P INPUT ACCEPT
--P OUTPUT ACCEPT
--P POSTROUTING ACCEPT
--A PREROUTING -p tcp -m tcp --dport 8080 -j DNAT --to-destination 192.168.255.11:80
--A POSTROUTING -s 192.168.255.0/24 -j MASQUERADE
 ```
 
 ### Configure a tcp proxy

@@ -164,9 +164,8 @@ On `node2` run:
 
 <!-- file: demo3-ex2-node2.sh -->
 ```sh
-NODE1_ADDR=$(getent hosts node1-pvt | awk '{print $1}')
 ovs-vsctl add-port br1 tun1 -- set interface tun1 \
-  type=geneve options:remote_ip=$NODE1_ADDR
+  type=geneve options:remote_ip=10.0.0.11
 ```
 
 Result:
@@ -181,7 +180,7 @@ d4e01762-4cd1-4e53-b502-78f852cd1ad3
         Port tun1
             Interface tun1
                 type: geneve
-                options: {remote_ip="10.0.0.110"}
+                options: {remote_ip="10.0.0.11"}
         Port vif3
             Interface vif3
                 type: internal
@@ -194,9 +193,8 @@ On `node1` run:
 
 <!-- file: demo3-ex2-node1.sh -->
 ```sh
-NODE2_ADDR=$(getent hosts node2-pvt | awk '{print $1}')
 ovs-vsctl add-port br1 tun1 -- set interface tun1 \
-  type=geneve options:remote_ip=$NODE2_ADDR
+  type=geneve options:remote_ip=10.0.0.12
 ```
 
 Result:
@@ -214,7 +212,7 @@ f151beb1-81eb-44b7-ab78-94524aae8bc8
         Port tun1
             Interface tun1
                 type: geneve
-                options: {remote_ip="10.0.0.23"}
+                options: {remote_ip="10.0.0.12"}
         Port vif2
             Interface vif2
                 type: internal
@@ -320,10 +318,10 @@ Use `tcpdump` on `node1` to show traffic. See encapsulated traffic on `eth1`:
 dropped privs to tcpdump
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
 listening on eth1, link-type EN10MB (Ethernet), snapshot length 262144 bytes
-18:45:33.653282 IP 10.0.0.23.63032 > 10.0.0.110.6081: Geneve, Flags [none], vni 0x0: IP 192.168.255.13 > 8.8.8.8: ICMP echo request, id 10039, seq 1, length 64
-18:45:33.666858 IP 10.0.0.110.55384 > 10.0.0.23.6081: Geneve, Flags [none], vni 0x0: IP 8.8.8.8 > 192.168.255.13: ICMP echo reply, id 10039, seq 1, length 64
-18:45:34.654735 IP 10.0.0.23.63032 > 10.0.0.110.6081: Geneve, Flags [none], vni 0x0: IP 192.168.255.13 > 8.8.8.8: ICMP echo request, id 10039, seq 2, length 64
-18:45:34.670627 IP 10.0.0.110.55384 > 10.0.0.23.6081: Geneve, Flags [none], vni 0x0: IP 8.8.8.8 > 192.168.255.13: ICMP echo reply, id 10039, seq 2, length 64
+18:45:33.653282 IP 10.0.0.12.63032 > 10.0.0.11.6081: Geneve, Flags [none], vni 0x0: IP 192.168.255.13 > 8.8.8.8: ICMP echo request, id 10039, seq 1, length 64
+18:45:33.666858 IP 10.0.0.11.55384 > 10.0.0.12.6081: Geneve, Flags [none], vni 0x0: IP 8.8.8.8 > 192.168.255.13: ICMP echo reply, id 10039, seq 1, length 64
+18:45:34.654735 IP 10.0.0.12.63032 > 10.0.0.11.6081: Geneve, Flags [none], vni 0x0: IP 192.168.255.13 > 8.8.8.8: ICMP echo request, id 10039, seq 2, length 64
+18:45:34.670627 IP 10.0.0.11.55384 > 10.0.0.12.6081: Geneve, Flags [none], vni 0x0: IP 8.8.8.8 > 192.168.255.13: ICMP echo reply, id 10039, seq 2, length 64
 ```
 
 And the un-encapsulated traffic egressing on `eth0`:

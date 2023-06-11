@@ -17,7 +17,7 @@ permalink: index.html
 
 ## Conventions used in this repository
 
-```sh
+```
 These are commands you should type in verbatim
 ```
 
