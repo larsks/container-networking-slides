@@ -128,7 +128,9 @@ We need to bring up all the interfaces before they will pass traffic:
 ip link set br0 up
 ip link set ns1-ext up
 ip link set ns2-ext up
+ip -n ns1 link set lo up
 ip -n ns1 link set ns1-int up
+ip -n ns2 link set lo up
 ip -n ns2 link set ns2-int up
 ```
 
