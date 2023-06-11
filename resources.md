@@ -1,5 +1,6 @@
 ---
 title: Additional resources
+order: 4
 ---
 
 ## Man pages

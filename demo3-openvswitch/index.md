@@ -1,5 +1,6 @@
 ---
 title: OpenVSwitch networking demo
+nav_order: 3
 ---
 
 * Table of contents

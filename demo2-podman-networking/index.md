@@ -1,5 +1,6 @@
 ---
 title: Podman container networking demo
+nav_order: 2
 ---
 
 * Table of contents
