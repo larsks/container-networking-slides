@@ -7,6 +7,10 @@ title: Additional resources
 - <https://man7.org/linux/man-pages/man7/network_namespaces.7.html>
 - <https://man7.org/linux/man-pages/man1/nsenter.1.html>
 - <https://man7.org/linux/man-pages/man1/unshare.1.html>
+- <https://man7.org/linux/man-pages/man8/ip.8.html>
+- <https://man7.org/linux/man-pages/man8/ip-link.8.html>
+- <https://man7.org/linux/man-pages/man8/ip-route.8.html>
+- <https://man7.org/linux/man-pages/man8/ip-netns.8.html>
 
 ## LWN "Namespaces in Operation"
 
