@@ -15,3 +15,8 @@ clean:
 
 serve:
 	python -m http.server > access_log 2>&1
+
+.PHONY: scripts
+scripts:
+	mkdir -p scripts
+	py extract-fenced.py -o scripts demo*/index.md -v

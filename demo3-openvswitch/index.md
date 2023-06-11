@@ -8,12 +8,11 @@ nav_order: 3
 
 ## Connect two containers
 
-<!-- file: demo3-ex1.sh -->
-
 Goal: Attach two containers to an OVS bridge and demonstrate successful communication.
 
 ### Create OVS bridge
 
+<!-- file: demo3-ex1.sh -->
 ```sh
 ovs-vsctl add-br br1
 ip link set br1 up
@@ -36,6 +35,7 @@ e2569579-f87a-4cd9-8d2c-e734a8849301
 
 ### Create namespaces
 
+<!-- file: demo3-ex1.sh -->
 ```sh
 ip netns add ns1
 ip netns add ns2
@@ -43,6 +43,7 @@ ip netns add ns2
 
 ### Create internal ports
 
+<!-- file: demo3-ex1.sh -->
 ```sh
 ovs-vsctl add-port br1 vif1 -- set interface vif1 type=internal
 ovs-vsctl add-port br1 vif2 -- set interface vif2 type=internal
@@ -78,6 +79,7 @@ f151beb1-81eb-44b7-ab78-94524aae8bc8
 
 ### Assign internal ports to namespaces
 
+<!-- file: demo3-ex1.sh -->
 ```sh
 ip link set netns ns1 dev vif1
 ip link set netns ns2 dev vif2
@@ -85,6 +87,7 @@ ip link set netns ns2 dev vif2
 
 ### Assign addresses to internal interfaces
 
+<!-- file: demo3-ex1.sh -->
 ```sh
 ip -n ns1 addr add 192.168.255.11/24 dev vif1
 ip -n ns1 link set vif1 up
@@ -96,14 +99,13 @@ ip -n ns2 link set lo up
 
 ###  Show communication between containers
 
+<!-- file: demo3-ex1.sh -->
 ```sh
 ip netns exec ns1 ping -c2 192.168.255.12
 ip netns exec ns2 ping -c2 192.168.255.11
 ```
 
 ## Overlay networking
-
-<!-- file: demo3-ex2-node2.sh -->
 
 Goal: Make containers on multiple hosts appear on the same internal network. We will use [Geneve][] tunnels to create a virtual network across two hosts.
 
@@ -113,6 +115,7 @@ Goal: Make containers on multiple hosts appear on the same internal network. We 
 
 On `node2` run:
 
+<!-- file: demo3-ex2-node2.sh -->
 ```sh
 ovs-vsctl add-br br1
 ip link set br1 up
@@ -122,6 +125,7 @@ ip link set br1 up
 
 On `node2` run:
 
+<!-- file: demo3-ex2-node2.sh -->
 ```sh
 ip netns add ns3
 ```
@@ -130,6 +134,7 @@ ip netns add ns3
 
 On `node2` run:
 
+<!-- file: demo3-ex2-node2.sh -->
 ```sh
 ovs-vsctl add-port br1 vif3 -- set interface vif3 type=internal
 ```
@@ -138,6 +143,7 @@ ovs-vsctl add-port br1 vif3 -- set interface vif3 type=internal
 
 On `node2` run:
 
+<!-- file: demo3-ex2-node2.sh -->
 ```sh
 ip link set netns ns3 dev vif3
 ```
@@ -146,6 +152,7 @@ ip link set netns ns3 dev vif3
 
 On `node2` run:
 
+<!-- file: demo3-ex2-node2.sh -->
 ```sh
 ip -n ns3 addr add 192.168.255.13/24 dev vif3
 ip -n ns3 link set vif3 up
@@ -155,6 +162,7 @@ ip -n ns3 link set vif3 up
 
 On `node2` run:
 
+<!-- file: demo3-ex2-node2.sh -->
 ```sh
 NODE1_ADDR=$(getent hosts node1-pvt | awk '{print $1}')
 ovs-vsctl add-port br1 tun1 -- set interface tun1 \
@@ -182,10 +190,9 @@ d4e01762-4cd1-4e53-b502-78f852cd1ad3
 
 ### Create geneve port (node1)
 
-<!-- file: demo3-ex2-node1.sh -->
-
 On `node1` run:
 
+<!-- file: demo3-ex2-node1.sh -->
 ```sh
 NODE2_ADDR=$(getent hosts node2-pvt | awk '{print $1}')
 ovs-vsctl add-port br1 tun1 -- set interface tun1 \
@@ -252,7 +259,6 @@ remote networks through the bridge on `node1`.
 On `node1` run:
 
 <!-- file: demo3-ex3-node1.sh -->
-
 ```sh
 ip -n ns1 route add default via 192.168.255.1
 ip -n ns2 route add default via 192.168.255.1
@@ -261,7 +267,6 @@ ip -n ns2 route add default via 192.168.255.1
 On `node2` run:
 
 <!-- file: demo3-ex3-node2.sh -->
-
 ```sh
 ip -n ns3 route add default via 192.168.255.1
 ```
@@ -271,7 +276,6 @@ ip -n ns3 route add default via 192.168.255.1
 On `node1` run:
 
 <!-- file: demo3-ex3-node1.sh -->
-
 ```sh
 ip addr add 192.168.255.1/24 dev br1
 ```
@@ -280,6 +284,7 @@ ip addr add 192.168.255.1/24 dev br1
 
 On `node1` run:
 
+<!-- file: demo3-ex3-node1.sh -->
 ```sh
 sysctl -w net.ipv4.ip_forward=1
 ```
@@ -288,6 +293,7 @@ sysctl -w net.ipv4.ip_forward=1
 
 On `node1` run:
 
+<!-- file: demo3-ex3-node1.sh -->
 ```sh
 iptables -t nat -A POSTROUTING -s 192.168.255.0/24 -j MASQUERADE
 ```

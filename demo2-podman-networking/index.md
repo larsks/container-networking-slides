@@ -8,13 +8,12 @@ nav_order: 2
 
 ## Containers on default bridge
 
-<!-- file: demo2-ex1.sh -->
-
 Goal: Understand how the network environment for a container closely resembles
 what we built by hand in the previous demo.
 
 ### Examine network configuration
 
+<!-- file: demo2-ex1.sh -->
 ```sh
 ip addr
 ```
@@ -49,6 +48,7 @@ Result:
 
 ### Create a container
 
+<!-- file: demo2-ex1.sh -->
 ```sh
 podman run --rm --replace --name web1 --hostname web1 -d ghcr.io/larsks/whoami:latest
 ```
@@ -65,6 +65,7 @@ CONTAINER ID  IMAGE                       COMMAND     CREATED        STATUS     
 
 There's a new `podman0` bridge:
 
+<!-- file: demo2-ex1.sh -->
 ```sh
 ip link show type bridge
 ip link show master podman0
@@ -72,6 +73,7 @@ ip link show master podman0
 
 And a new namespace:
 
+<!-- file: demo2-ex1.sh -->
 ```sh
 ip netns
 ```
@@ -93,6 +95,7 @@ netns-833f4c4b-c818-fc03-8bca-10c8f593fd9e (id: 0)
 
 Using `podman exec`:
 
+<!-- file: demo2-ex1.sh -->
 ```sh
 podman exec web1 ip addr
 ```
@@ -117,6 +120,7 @@ Result:
 
 Using `nsenter`:
 
+<!-- file: demo2-ex1.sh -->
 ```sh
 web1_pid=$(podman inspect web1 -f '{{.State.Pid}}')
 nsenter -t $web1_pid -n ip addr
@@ -143,6 +147,7 @@ Result:
 
 ### Examine iptables rules
 
+<!-- file: demo2-ex1.sh -->
 ```sh
 iptables -t nat -S
 ```
@@ -171,13 +176,12 @@ Result:
 
 ## Default network vs user-defined network
 
-<!-- file: demo2-ex2.sh -->
-
 Goal: Show that DNS lookups work on user defined networks, but not on the
 default network.
 
 ### Create two containers
 
+<!-- file: demo2-ex2.sh -->
 ```sh
 podman run --rm --replace --name web1 --hostname web1 -d ghcr.io/larsks/whoami:latest
 podman run --rm --replace --name web2 --hostname web2 -d ghcr.io/larsks/whoami:latest
@@ -194,6 +198,7 @@ CONTAINER ID  IMAGE                       COMMAND     CREATED        STATUS     
 
 ### Show name lookup failure
 
+<!-- file: demo2-ex2.sh -->
 ```sh
 podman exec web1 curl -sS web2
 ```
@@ -207,6 +212,7 @@ curl: (6) Could not resolve host: web2
 
 ### Create user-defined network
 
+<!-- file: demo2-ex2.sh -->
 ```sh
 podman network create mynetwork
 ```
@@ -222,6 +228,7 @@ NETWORK ID    NAME        DRIVER
 
 ### Create containers attached to network
 
+<!-- file: demo2-ex2.sh -->
 ```sh
 podman run --replace --name web1 --hostname web1 -d \
   --network mynetwork ghcr.io/larsks/whoami:latest
@@ -231,6 +238,7 @@ podman run --replace --name web2 --hostname web2 -d \
 
 ### Show name lookup success
 
+<!-- file: demo2-ex2.sh -->
 ```sh
 podman exec web1 curl -sS web2
 ```
@@ -253,13 +261,12 @@ Accept: */*
 
 ## No published ports
 
-<!-- file: demo2-ex3.sh -->
-
 Goal: Understand how to access containerized services when we're not publishing
 any ports.
 
 ### Start containers
 
+<!-- file: demo2-ex3.sh -->
 ```sh
 podman run --rm --replace --name web1 --hostname web1 -d \
   --network mynetwork ghcr.io/larsks/whoami:latest
@@ -269,6 +276,7 @@ podman run --rm --replace --name web2 --hostname web2 -d \
 
 ### Demonstrate access from host
 
+<!-- file: demo2-ex3.sh -->
 ```sh
 web1_addr=$(podman inspect web1 -f '{{.NetworkSettings.Networks.mynetwork.IPAddress}}')
 curl $web1_addr
@@ -307,12 +315,12 @@ Accept: */*
 
 ## Published on different ports
 
-<!-- file: demo2-ex4.sh -->
 
 Goal: Understand how to expose services on different host ports.
 
 ### Start containers
 
+<!-- file: demo2-ex4.sh -->
 ```sh
 podman run --rm --replace --name web1 --hostname web1 -p 8080:80 -d \
   --network mynetwork ghcr.io/larsks/whoami:latest
@@ -322,6 +330,7 @@ podman run --rm --replace --name web2 --hostname web2 -p 8081:80 -d \
 
 ### Demonstrate access from host
 
+<!-- file: demo2-ex4.sh -->
 ```sh
 curl http://localhost:8080
 curl http://localhost:8081
@@ -356,6 +365,7 @@ Accept: */*
 
 ### Examine iptables rules
 
+<!-- file: demo2-ex4.sh -->
 ```sh
 iptables -t nat -S
 ```
@@ -402,12 +412,11 @@ We see the same `route_localnet` setting we saw in the namespace demo.
 
 ## Published on different addresses
 
-<!-- file: demo2-ex5.sh -->
-
 Goal: Understand how to expose services on different host addresses.
 
 ### Configure additional addresses
 
+<!-- file: demo2-ex5.sh -->
 ```sh
 ip addr add 192.168.121.200/24 dev eth0
 ip addr add 192.168.121.201/24 dev eth0
@@ -434,6 +443,7 @@ Result:
 
 ### Start containers
 
+<!-- file: demo2-ex5.sh -->
 ```sh
 podman run --rm --replace --name web1 --hostname web1 -p 192.168.121.200:80:80 -d \
   --network mynetwork ghcr.io/larsks/whoami:latest
@@ -452,6 +462,7 @@ d8c01a597b12  ghcr.io/larsks/whoami:latest  whoami      2 seconds ago  Up 2 seco
 
 ### Confirm access from host
 
+<!-- file: demo2-ex5.sh -->
 ```sh
 curl http://192.168.121.200
 curl http://192.168.121.201

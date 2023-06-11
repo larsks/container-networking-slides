@@ -8,8 +8,6 @@ nav_order: 1
 
 ## Basic namespace setup
 
-<!-- file: demo1-ex1.sh -->
-
 Goal: Create two namespaces connected to the same virtual network. Demonstrate
 that the two namespaces are able to communicate.
 
@@ -17,6 +15,7 @@ that the two namespaces are able to communicate.
 
 Add a Linux bridge device:
 
+<!-- file: demo1-ex1.sh -->
 ```sh
 ip link add br0 type bridge
 ```
@@ -31,6 +30,7 @@ Result:
 
 ### Create namespaces
 
+<!-- file: demo1-ex1.sh -->
 ```sh
 ip netns add ns1
 ip netns add ns2
@@ -46,6 +46,7 @@ ns1 (id: 0)
 
 ### Create veth devices
 
+<!-- file: demo1-ex1.sh -->
 ```sh
 ip link add ns1-ext type veth peer name ns1-int netns ns1
 ip link add ns2-ext type veth peer name ns2-int netns ns2
@@ -69,6 +70,7 @@ Result:
 
 ### Add vif devices to bridge
 
+<!-- file: demo1-ex1.sh -->
 ```sh
 ip link set master br0 dev ns1-ext
 ip link set master br0 dev ns2-ext
@@ -86,6 +88,7 @@ Result:
 
 ### Assign addresses to internal interfaces
 
+<!-- file: demo1-ex1.sh -->
 ```sh
 ip -n ns1 addr add 192.168.255.11/24 dev ns1-int
 ip -n ns2 addr add 192.168.255.12/24 dev ns2-int
@@ -112,6 +115,7 @@ Result:
 
 ###  Show communication between namespaces
 
+<!-- file: demo1-ex1.sh -->
 ```sh
 ip netns exec ns1 ping -c2 192.168.255.12
 ip netns exec ns2 ping -c2 192.168.255.11
@@ -128,6 +132,7 @@ ping: connect: Network is unreachable
 
 We need to bring up all the interfaces before they will pass traffic:
 
+<!-- file: demo1-ex1.sh -->
 ```sh
 ip link set br0 up
 ip link set ns1-ext up
@@ -161,12 +166,11 @@ rtt min/avg/max/mdev = 0.016/0.032/0.048/0.016 ms
 
 ## Communication with the host
 
-<!-- file: demo1-ex2.sh -->
-
 Goal: Allow the namespaces to successfully communicate with the host.
 
 ### Show failure to communicate with host
 
+<!-- file: demo1-ex2.sh -->
 ```sh
 host_address="$(ip route | sed -n '/default/ s/.*src \([^ ]*\).*/\1/p;q')"
 ip netns exec ns1 ping -c2 $host_address
@@ -182,6 +186,7 @@ The namespace doesn't know how to reach the host.
 
 ### Add address to bridge
 
+<!-- file: demo1-ex2.sh -->
 ```sh
 ip addr add 192.168.255.1/24 dev br0
 ```
@@ -200,6 +205,7 @@ Result:
 
 ### Add default route to namespaces
 
+<!-- file: demo1-ex2.sh -->
 ```sh
 ip -n ns1 route add default via 192.168.255.1
 ip -n ns2 route add default via 192.168.255.1
@@ -218,6 +224,7 @@ default via 192.168.255.1 dev ns2-int
 
 ### Show successful communication with host
 
+<!-- file: demo1-ex2.sh -->
 ```sh
 host_address="$(ip route | sed -n '/default/ s/.*src \([^ ]*\).*/\1/p;q')"
 ip netns exec ns1 ping -c2 $host_address
@@ -239,12 +246,11 @@ rtt min/avg/max/mdev = 0.042/0.049/0.056/0.007 ms
 
 ## Communicating with remote services
 
-<!-- file: demo1-ex3.sh -->
-
 Goal: Allow the namespaces to communicate with remote services
 
 ### Show failure to communicate with remote address
 
+<!-- file: demo1-ex3.sh -->
 ```sh
 ip netns exec ns1 ping -c2 8.8.8.8
 ```
@@ -263,6 +269,7 @@ Use `tcpdump` to see that no traffic shows up on `eth0`.
 
 ### Enable ip forwarding
 
+<!-- file: demo1-ex3.sh -->
 ```sh
 sysctl -w net.ipv4.ip_forward=1
 ```
@@ -281,6 +288,7 @@ listening on eth0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 
 ### Add masquerade rules on host
 
+<!-- file: demo1-ex3.sh -->
 ```sh
 iptables -t nat -A POSTROUTING -s 192.168.255.0/24 -j MASQUERADE
 ```
@@ -298,6 +306,7 @@ Result:
 
 ### Show successful communication with remote address
 
+<!-- file: demo1-ex3.sh -->
 ```sh
 ip netns exec ns1 ping -c2 8.8.8.8
 ```
@@ -317,18 +326,18 @@ listening on eth0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 
 ## Running a service in a namespace
 
-<!-- file: demo1-ex{filenumber}.sh -->
-
 Goal: Run a simple web server in a namespace. Demonstrate different ways of accessing the service.
 
 ### Start a web service in the ns1 namespace
 
+<!-- file: demo1-ex4.sh -->
 ```sh
 ip netns exec ns1 whoami &
 ```
 
 ### Access the service using the address of ns1
 
+<!-- file: demo1-ex4.sh -->
 ```sh
 curl 192.168.255.11
 ```
@@ -350,6 +359,7 @@ Accept: */*
 
 Create a `PREROUTING` rule to redirect traffic to port 8080 to the service:
 
+<!-- file: demo1-ex4.sh -->
 ```sh
 iptables -t nat -A PREROUTING -p tcp --dport 8080 -j DNAT --to-destination 192.168.255.11:80
 ```
@@ -386,6 +396,7 @@ Accept: */*
 
 This attempt fails:
 
+<!-- file: demo1-ex4.sh -->
 ```sh
 curl --connect-timeout 10 node1-pub:8080
 ```
@@ -398,6 +409,7 @@ curl: (7) Failed to connect to node1-pub port 8080 after 0 ms: Couldn't connect 
 
 Locally originating traffic does not traverse `PREROUTING` chain. We need an `OUTPUT` rule:
 
+<!-- file: demo1-ex4.sh -->
 ```sh
 iptables -t nat -A OUTPUT -p tcp --dport 8080 -j DNAT --to-destination 192.168.255.11:80
 ```
@@ -422,6 +434,7 @@ Accept: */*
 
 This attempt fails:
 
+<!-- file: demo1-ex4.sh -->
 ```sh
 curl --connect-timeout 10 localhost:8080
 ```
@@ -434,6 +447,7 @@ curl: (28) Failed to connect to localhost port 8080 after 10001 ms: Timeout was 
 
 Packets originating from `127.0.0.1` or `::1` are discarded by routing subsystem. We need to set `route_localnet` `sysctl` so that they are considered for routing:
 
+<!-- file: demo1-ex4.sh -->
 ```sh
 sysctl -w net.ipv4.conf.br0.route_localnet=1
 ```
@@ -446,6 +460,7 @@ The `curl` command still fails, because the packets arriving inside the namespac
 
 We can't respond to a packet from `127.0.0.1`. We need a `MASQUERADE` rule for packets originating from `127.0.0.1`:
 
+<!-- file: demo1-ex4.sh -->
 ```sh
 iptables -t nat -A POSTROUTING -s 127.0.0.1 -d 192.168.255.0/24 -j MASQUERADE
 ```
@@ -482,8 +497,6 @@ Accept: */*
 
 ## Running a service in a namespace, take two
 
-<!-- file: demo1-ex{filenumber}.sh -->
-
 Goal: Show an alternate solution for handling traffic from `localhost`.
 
 This is how Docker handles connections from the local host.
@@ -492,6 +505,7 @@ This is how Docker handles connections from the local host.
 
 Discard the `sysctl` setting and the `MASQUERADE` rule for traffic from `localhost`:
 
+<!-- file: demo1-ex5.sh -->
 ```sh
 sysctl -w net.ipv4.conf.br0.route_localnet=0
 iptables -t nat -D POSTROUTING -s 127.0.0.1/32 -d 192.168.255.0/24 -j MASQUERADE
@@ -512,6 +526,7 @@ Result:
 
 ### Configure a tcp proxy
 
+<!-- file: demo1-ex5.sh -->
 ```sh
 socat tcp-listen:8080,fork tcp-connect:192.168.255.11:80 &
 ```
