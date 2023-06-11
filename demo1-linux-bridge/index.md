@@ -2,6 +2,9 @@
 title: Linux namespaces demo
 ---
 
+* Table of contents
+{:toc}
+
 ## Basic namespace setup
 
 <!-- file: demo1-ex1.sh -->

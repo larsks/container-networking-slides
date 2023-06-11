@@ -2,6 +2,9 @@
 title: Podman container networking demo
 ---
 
+* Table of contents
+{:toc}
+
 ## Containers on default bridge
 
 <!-- file: demo2-ex1.sh -->

@@ -2,6 +2,9 @@
 title: OpenVSwitch networking demo
 ---
 
+* Table of contents
+{:toc}
+
 ## Connect two containers
 
 <!-- file: demo3-ex1.sh -->
