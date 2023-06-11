@@ -87,8 +87,10 @@ ip link set netns ns2 dev vif2
 ```sh
 ip -n ns1 addr add 192.168.255.11/24 dev vif1
 ip -n ns1 link set vif1 up
+ip -n ns1 link set lo up
 ip -n ns2 addr add 192.168.255.12/24 dev vif2
 ip -n ns2 link set vif2 up
+ip -n ns2 link set lo up
 ```
 
 ###  Show communication between containers
@@ -100,7 +102,7 @@ ip netns exec ns2 ping -c2 192.168.255.11
 
 ## Overlay networking
 
-<!-- file: demo3-ex2.sh -->
+<!-- file: demo3-ex2-node2.sh -->
 
 Goal: Make containers on multiple hosts appear on the same internal network. We will use [Geneve][] tunnels to create a virtual network across two hosts.
 
@@ -179,6 +181,8 @@ d4e01762-4cd1-4e53-b502-78f852cd1ad3
 
 ### Create geneve port (node1)
 
+<!-- file: demo3-ex2-node1.sh -->
+
 On `node1` run:
 
 ```sh
@@ -211,21 +215,33 @@ f151beb1-81eb-44b7-ab78-94524aae8bc8
 
 ### Show successful communication with ns3
 
-On `node1` run:
+Namespaces on `node1` can reach namespaces on `node2`:
 
-```sh
-ip netns exec ns1 ping -c2 192.168.255.13
+```console
+[root@node1 ~]# ip netns exec ns1 ping -c2 192.168.255.13
+PING 192.168.255.13 (192.168.255.13) 56(84) bytes of data.
+64 bytes from 192.168.255.13: icmp_seq=1 ttl=64 time=0.901 ms
+64 bytes from 192.168.255.13: icmp_seq=2 ttl=64 time=0.437 ms
+
+--- 192.168.255.13 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1051ms
+rtt min/avg/max/mdev = 0.437/0.669/0.901/0.232 ms
 ```
 
-On `node2` run:
+Namespaces on `node2` can reach namespaces on `node1`:
 
-```sh
-ip netns exec ns3 ping -c2 192.168.255.11
+```console
+[root@node2 ~]# ip netns exec ns3 ping -c2 192.168.255.11
+PING 192.168.255.11 (192.168.255.11) 56(84) bytes of data.
+64 bytes from 192.168.255.11: icmp_seq=1 ttl=64 time=0.627 ms
+64 bytes from 192.168.255.11: icmp_seq=2 ttl=64 time=0.343 ms
+
+--- 192.168.255.11 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1054ms
+rtt min/avg/max/mdev = 0.343/0.485/0.627/0.142 ms
 ```
 
 ## Outbound access through node1
-
-<!-- file: demo3-ex3.sh -->
 
 Goal: Configure access to remote networks. Demonstrate that `ns3` accesses
 remote networks through the bridge on `node1`.
@@ -234,12 +250,16 @@ remote networks through the bridge on `node1`.
 
 On `node1` run:
 
-```console
+<!-- file: demo3-ex3-node1.sh -->
+
+```sh
 ip -n ns1 route add default via 192.168.255.1
 ip -n ns2 route add default via 192.168.255.1
 ```
 
 On `node2` run:
+
+<!-- file: demo3-ex3-node2.sh -->
 
 ```sh
 ip -n ns3 route add default via 192.168.255.1
@@ -248,6 +268,8 @@ ip -n ns3 route add default via 192.168.255.1
 ### Add gateway address to OVS bridge
 
 On `node1` run:
+
+<!-- file: demo3-ex3-node1.sh -->
 
 ```sh
 ip addr add 192.168.255.1/24 dev br1
@@ -271,10 +293,17 @@ iptables -t nat -A POSTROUTING -s 192.168.255.0/24 -j MASQUERADE
 
 ### Show successful communication with remote address
 
-On `node2` run:
+Namespace `ns3` on `node2` can reach remote sites via the default gateway on `node1`:
 
-```sh
-ip netns exec ns3 ping -c2 8.8.8.8
+```console
+[root@node2 ~]# ip netns exec ns3 ping -c2 8.8.8.8
+PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=115 time=12.9 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=115 time=11.3 ms
+
+--- 8.8.8.8 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+rtt min/avg/max/mdev = 11.291/12.105/12.919/0.814 ms
 ```
 
 Use `tcpdump` on `node1` to show traffic. See encapsulated traffic on `eth1`:
