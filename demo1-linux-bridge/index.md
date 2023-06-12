@@ -172,13 +172,13 @@ Goal: Allow the namespaces to successfully communicate with the host.
 
 <!-- file: demo1-ex2.sh -->
 ```sh
-host_address="$(ip route | sed -n '/default/ s/.*src \([^ ]*\).*/\1/p;q')"
-ip netns exec ns1 ping -c2 $host_address
+ip netns exec ns1 ping -c2 node1-pub
 ```
 
 Result:
 
 ```console
+[root@node1 ~]# ip netns exec ns1 ping -c2 node1-pub
 ping: connect: Network is unreachable
 ```
 
@@ -226,15 +226,13 @@ default via 192.168.255.1 dev ns2-int
 
 <!-- file: demo1-ex2.sh -->
 ```sh
-host_address="$(ip route | sed -n '/default/ s/.*src \([^ ]*\).*/\1/p;q')"
-ip netns exec ns1 ping -c2 $host_address
+ip netns exec ns1 ping -c2 node1-pub
 ```
 
 Result:
 
 ```console
-[root@node1 ~]# host_address="$(ip route | sed -n '/default/ s/.*src \([^ ]*\).*/\1/p;q')"
-[root@node1 ~]# ip netns exec ns1 ping -c2 $host_address
+[root@node1 ~]# ip netns exec ns1 ping -c2 node1-pub
 PING 192.168.121.67 (192.168.121.67) 56(84) bytes of data.
 64 bytes from 192.168.121.67: icmp_seq=1 ttl=64 time=0.042 ms
 64 bytes from 192.168.121.67: icmp_seq=2 ttl=64 time=0.056 ms
