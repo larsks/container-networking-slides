@@ -1,0 +1,10 @@
+# Managed by Ansible
+[connection]
+id=private
+type=ethernet
+interface-name=eth1
+autoconnect=true
+
+[ipv4]
+method=manual
+address1={{ address }}

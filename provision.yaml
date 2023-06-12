@@ -1,8 +1,44 @@
 - hosts: all
+  gather_facts: false
+  become: true
+  tags: [network]
+  tasks:
+    - name: Read address from ifcfg file
+      changed_when: false
+      command: >-
+        awk -F= '$1 == "IPADDR" {print $2}' /etc/sysconfig/network-scripts/ifcfg-eth1
+      register: ifcfg
+
+    - name: Create private network config
+      template:
+        src: files/private.nmconnection
+        dest: /etc/NetworkManager/system-connections/private.nmconnection
+        owner: root
+        mode: 0600
+      vars:
+        address: "{{ ifcfg.stdout }}"
+      notify: restart nm
+
+  handlers:
+    - name: restart nm
+      listen: restart nm
+      service:
+        name: NetworkManager
+        state: restarted
+
+    - name: bring up interface
+      listen: restart nm
+      command: nmcli c up private
+
+
+- hosts: all
   gather_facts: true
   become: true
   tags: [hosts]
   tasks:
+    - debug:
+        var: ansible_eth1
+
     - name: Remove old entries from /etc/hosts
       lineinfile:
         path: /etc/hosts
