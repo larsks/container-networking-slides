@@ -8,21 +8,21 @@
         path: /etc/hosts
         regexp: "{{ item.0 }}-{{ item.1 }}"
         state: absent
-      loop: "{{ groups.nodes|product(['pvt', 'pub']) }}"
+      loop: "{{ groups.all|product(['pvt', 'pub']) }}"
 
     - name: Add public address to /etc/hosts
       lineinfile:
         path: /etc/hosts
         regexp: "{{ item }}-pub"
         line: "{{ hostvars[item].ansible_eth0.ipv4.address }} {{ item }}-pub"
-      loop: "{{ groups.nodes }}"
+      loop: "{{ groups.all }}"
 
     - name: Add private address to /etc/hosts
       lineinfile:
         path: /etc/hosts
         regexp: "{{ item }}-pvt"
         line: "{{ hostvars[item].ansible_eth1.ipv4.address }} {{ item }}-pvt"
-      loop: "{{ groups.nodes }}"
+      loop: "{{ groups.all }}"
 
 - hosts: all
   gather_facts: false
