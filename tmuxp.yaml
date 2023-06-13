@@ -1,0 +1,10 @@
+session_name: demo
+windows:
+  - window_name: node1
+    layout: even-horizontal
+    panes:
+      - focus: true
+      -
+  - window_name: workaround
+    panes:
+      - exit
