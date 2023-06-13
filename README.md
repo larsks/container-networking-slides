@@ -5,7 +5,7 @@ permalink: index.html
 
 # Container networking
 
-This content is published automatically at <http://oddbit.com/container-networking-slides/>.
+This content is published automatically at <http://oddbit.com/container-networking-slides/>. You can find the sources [on GitHub](https://github.com/larsks/container-networking-slides).
 
 ## Presentation
 
