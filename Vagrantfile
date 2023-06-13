@@ -6,7 +6,6 @@ Vagrant.configure("2") do |config|
   config.vm.provider :libvirt do |libvirt|
     libvirt.uri = "qemu:///system"
     libvirt.memory = 4096
-    libvirt.storage :file, :size => "10G", :type => "qcow2"
   end
 
   config.vm.box = "fedora/38-cloud-base"
